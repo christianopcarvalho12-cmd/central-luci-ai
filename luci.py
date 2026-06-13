@@ -2,11 +2,11 @@ import streamlit as st
 import requests
 from deep_translator import GoogleTranslator
 
-# Configuração Visual
+# Configuração Visual da Interface
 st.set_page_config(page_title="Luci AI Central", page_icon="🤖")
 st.markdown("<h1 style='text-align: center;'>🤖 Central de Comando Luci AI</h1>", unsafe_allow_html=True)
 
-# Funções principais
+# Funções do Sistema
 def traduzir(texto):
     try:
         return GoogleTranslator(source='pt', target='en').translate(texto)
@@ -32,13 +32,14 @@ def criar_imagem_ai(prompt):
 opcao = st.radio("Escolha o método de busca:", ["Criar Imagem (IA)", "Buscar Registro (Real)"], horizontal=True)
 ordem = st.text_input("Sua ordem, Senhor Christiano:")
 
+# Execução do Comando
 if st.button("⚡ EXECUTAR ORDEM"):
     if ordem:
         with st.spinner('Luci processando ordem...'):
-            # Seleção do link
+            # Seleção do link de acordo com a opção
             link = criar_imagem_ai(ordem) if "Criar" in opcao else buscar_imagem_real(ordem)
             
-            # Verificação de robustez antes de exibir
+            # Verificação de segurança: checa se o link da imagem está acessível antes de exibir
             try:
                 response = requests.head(link, timeout=10)
                 if response.status_code == 200:
@@ -47,6 +48,6 @@ if st.button("⚡ EXECUTAR ORDEM"):
                 else:
                     st.warning("A Luci teve dificuldade em encontrar essa imagem. Tente uma descrição diferente.")
             except Exception:
-                st.error("Erro de conexão. A Luci não conseguiu contatar o serviço de imagens.")
+                st.error("Erro de conexão. A Luci não conseguiu contatar o serviço de imagens agora.")
     else:
         st.warning("Por favor, digite uma ordem para prosseguir.")
