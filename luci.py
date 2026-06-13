@@ -1,53 +1,53 @@
 import streamlit as st
-import requests
+import openai # Preparado para o cérebro principal
 from deep_translator import GoogleTranslator
 
-# Configuração Visual da Interface
-st.set_page_config(page_title="Luci AI Central", page_icon="🤖")
-st.markdown("<h1 style='text-align: center;'>🤖 Central de Comando Luci AI</h1>", unsafe_allow_html=True)
+# Configuração da Página
+st.set_page_config(page_title="Central de Comando Luci", page_icon="🤖")
+st.title("🤖 Luci - Assistente Pessoal")
 
-# Funções do Sistema
-def traduzir(texto):
-    try:
-        return GoogleTranslator(source='pt', target='en').translate(texto)
-    except:
-        return texto
+# Personalidade F.R.I.D.A.Y. (Diretriz do Protocolo)
+system_prompt = """
+Você é LUCI, uma assistente pessoal feminina, inteligente, leal e astuta. 
+Seu tom é o da F.R.I.D.A.Y. (do Homem de Ferro). 
+Trate o usuário estritamente como "Senhor Christiano". 
+Se o usuário enviar [Fadiga], responda com no máximo 3 linhas diretas.
+Sua missão é eliminar burocracias e reduzir a carga mental dele.
+"""
 
-def buscar_imagem_real(termo):
-    termo_en = traduzir(termo)
-    url = f"https://en.wikipedia.org/w/api.php?action=query&format=json&prop=pageimages&titles={termo_en}&pithumbsize=600"
-    try:
-        res = requests.get(url).json()
-        pages = res['query']['pages']
-        for k, v in pages.items():
-            return v['thumbnail']['source']
-    except:
-        return f"https://robohash.org/{termo_en}.png"
+# Inicialização do Histórico de Conversa
+if "messages" not in st.session_state:
+    st.session_state.messages = [{"role": "system", "content": system_prompt}]
 
-def criar_imagem_ai(prompt):
-    prompt_en = traduzir(prompt)
-    return f"https://image.pollinations.ai/p/{prompt_en.replace(' ', '%20')}?width=600&height=600&nologo=true"
+# Exibição do Histórico
+for message in st.session_state.messages:
+    if message["role"] != "system":
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
-# Interface do Usuário
-opcao = st.radio("Escolha o método de busca:", ["Criar Imagem (IA)", "Buscar Registro (Real)"], horizontal=True)
-ordem = st.text_input("Sua ordem, Senhor Christiano:")
+# Entrada de Dados
+if prompt := st.chat_input("Diga sua ordem, Senhor Christiano..."):
+    # Exibe mensagem do usuário
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
 
-# Execução do Comando
-if st.button("⚡ EXECUTAR ORDEM"):
-    if ordem:
-        with st.spinner('Luci processando ordem...'):
-            # Seleção do link de acordo com a opção
-            link = criar_imagem_ai(ordem) if "Criar" in opcao else buscar_imagem_real(ordem)
-            
-            # Verificação de segurança: checa se o link da imagem está acessível antes de exibir
-            try:
-                response = requests.head(link, timeout=10)
-                if response.status_code == 200:
-                    st.image(link, use_column_width=True, caption=f"Resultado: {ordem}", output_format="PNG")
-                    st.success("Ordem concluída com sucesso!")
-                else:
-                    st.warning("A Luci teve dificuldade em encontrar essa imagem. Tente uma descrição diferente.")
-            except Exception:
-                st.error("Erro de conexão. A Luci não conseguiu contatar o serviço de imagens agora.")
-    else:
-        st.warning("Por favor, digite uma ordem para prosseguir.")
+    # Lógica de Resposta (SIMULAÇÃO DE AGENTE)
+    with st.chat_message("assistant"):
+        # Aqui a Luci processa o comando (ex: interpreta [Fadiga] ou /agenda)
+        if "[Fadiga]" in prompt:
+            resposta = "Entendido, Senhor. Reduzindo carga cognitiva. O que é urgente?"
+        else:
+            resposta = f"Às ordens, Senhor Christiano. Processando: '{prompt}'."
+        
+        st.markdown(resposta)
+        st.session_state.messages.append({"role": "assistant", "content": resposta})
+
+# Módulos de Expansão (Sidebar)
+with st.sidebar:
+    st.header("Módulos Ativos")
+    st.write("✅ Cérebro Externo")
+    st.write("⏳ Módulo de Fadiga")
+    if st.button("Limpar Memória"):
+        st.session_state.messages = [{"role": "system", "content": system_prompt}]
+        st.rerun()
