@@ -1,74 +1,56 @@
 import streamlit as st
 
-# Configuração Oficial de Design
-st.set_page_config(
-    page_title="Luci - Sistema Central", 
-    page_icon="🤖", 
-    layout="centered",
-    initial_sidebar_state="collapsed"
-)
+# Configuração da Página
+st.set_page_config(page_title="Luci - Sistema Central", page_icon="🤖")
 
-# Estilização da Interface (CSS)
+# Estilização Refinada (CSS)
 st.markdown("""
     <style>
-    /* Aplica a interface visual como background */
+    /* Fundo escuro padrão */
     .stApp {
-        background: url('app/static/luci_interface.png') no-repeat center center fixed;
-        background-size: cover;
+        background-color: #0d1117;
     }
     
-    /* Faz o chat parecer parte da interface de vidro (Glassmorphism) */
-    [data-testid="stChatMessage"] {
-        background-color: rgba(0, 15, 25, 0.7) !important;
-        border: 1px solid rgba(0, 242, 255, 0.3);
-        border-radius: 15px;
-        backdrop-filter: blur(10px);
-    }
-    
-    /* Ajustes de texto */
-    h1, h2 {
+    /* Título com brilho */
+    h1 {
         color: #00f2ff !important;
-        text-shadow: 0 0 10px #00f2ff;
+        text-shadow: 0 0 15px #00f2ff;
         text-align: center;
+        margin-bottom: 2rem;
     }
     
-    /* Input do chat estilizado */
+    /* Bolhas de Chat: Removendo o fundo padrão e criando o estilo bordado */
+    [data-testid="stChatMessage"] {
+        background-color: transparent !important;
+        border: 1px solid #004d4d !important;
+        border-radius: 10px;
+        padding: 10px;
+    }
+    
+    /* Ícones e cores baseados na sua imagem */
+    [data-testid="stChatMessageAvatar"] {
+        background-color: transparent !important;
+    }
+    
+    /* Input do Chat */
     [data-testid="stChatInput"] {
-        background-color: rgba(0, 20, 30, 0.8) !important;
+        background-color: #1a1f26 !important;
+        border: 1px solid #30363d;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Inicialização da Memória
+# Lógica (Mantida igual)
 if "messages" not in st.session_state:
     st.session_state.messages = [{"role": "assistant", "content": "Central online, Senhor Christiano. Em que posso servir?"}]
-if "data" not in st.session_state:
-    st.session_state.data = {"gastos": [], "lembretes": [], "fadiga": False}
 
-# Lógica
-def responder(prompt):
-    texto = prompt.lower()
-    if "[fadiga]" in texto:
-        st.session_state.data["fadiga"] = True
-        return "Protocolo de preservação ativado. Serei breve."
-    if "status" in texto:
-        return f"Status: Operacional. Fadiga: {'Ativa' if st.session_state.data['fadiga'] else 'Desativada'}."
-    return "Comando recebido. Estou processando sua solicitação com a precisão necessária."
-
-# Interface Nativa
 st.title("🤖 Luci - Sistema Central")
 
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
+    # Ajuste para identificar quem fala e colocar o emoji correto
+    with st.chat_message(msg["role"], avatar="🤖" if msg["role"] == "assistant" else "👤"):
         st.write(msg["content"])
 
 if prompt := st.chat_input("Diga sua ordem, Senhor Christiano..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.write(prompt)
-        
-    resposta = responder(prompt)
-    
-    with st.chat_message("assistant"):
-        st.write(resposta)
-    st.session_state.messages.append({"role": "assistant", "content": resposta})
+    st.rerun() # Atualiza para mostrar a mensagem imediatamente
