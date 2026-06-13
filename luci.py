@@ -34,7 +34,6 @@ if st.button("⚡ EXECUTAR ORDEM"):
         with st.spinner('Luci processando ordem...'):
             link = criar_imagem_ai(ordem) if "Criar" in opcao else buscar_imagem_real(ordem)
             # Substitua a linha antiga st.image por esta:
-st.image(link, use_column_width=True, caption=f"Resultado: {ordem}", output_format="PNG")
-            st.success("Ordem concluída!")
+st.image(link, use_column_width=True, caption=f"Resultado: {ordem}", output_format="PNG") st.success("Ordem concluída!")
     else:
         st.warning("Por favor, digite uma ordem.")
