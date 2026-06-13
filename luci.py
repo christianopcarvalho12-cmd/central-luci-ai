@@ -8,6 +8,37 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# Estilização da Interface (CSS)
+st.markdown("""
+    <style>
+    /* Aplica a interface visual como background */
+    .stApp {
+        background: url('app/static/luci_interface.png') no-repeat center center fixed;
+        background-size: cover;
+    }
+    
+    /* Faz o chat parecer parte da interface de vidro (Glassmorphism) */
+    [data-testid="stChatMessage"] {
+        background-color: rgba(0, 15, 25, 0.7) !important;
+        border: 1px solid rgba(0, 242, 255, 0.3);
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+    }
+    
+    /* Ajustes de texto */
+    h1, h2 {
+        color: #00f2ff !important;
+        text-shadow: 0 0 10px #00f2ff;
+        text-align: center;
+    }
+    
+    /* Input do chat estilizado */
+    [data-testid="stChatInput"] {
+        background-color: rgba(0, 20, 30, 0.8) !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # Inicialização da Memória
 if "messages" not in st.session_state:
     st.session_state.messages = [{"role": "assistant", "content": "Central online, Senhor Christiano. Em que posso servir?"}]
@@ -25,8 +56,7 @@ def responder(prompt):
     return "Comando recebido. Estou processando sua solicitação com a precisão necessária."
 
 # Interface Nativa
-st.title("🤖 Luci - Assistente Pessoal")
-st.subheader("Sistema de Gerenciamento de Vida")
+st.title("🤖 Luci - Sistema Central")
 
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
